@@ -1,0 +1,806 @@
+{
+  "base_url": "http://127.0.0.1:8000",
+  "success": true,
+  "created_order_ids": [
+    2,
+    3
+  ],
+  "requests": [
+    {
+      "time": "2026-09-18T04:29:49.180435+00:00",
+      "method": "GET",
+      "path": "/users/me",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 4,
+        "username": "agent_viewer_step00",
+        "email": "agent_viewer_step00@example.com",
+        "role": "viewer",
+        "profile_picture": null
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.003478+00:00",
+      "method": "GET",
+      "path": "/users/me",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 3,
+        "username": "agent_admin",
+        "email": "agent_admin@example.com",
+        "role": "admin",
+        "profile_picture": null
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.008007+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.012507+00:00",
+      "method": "GET",
+      "path": "/orders/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 20,
+        "reserved_quantity": 0,
+        "status": "fulfilled",
+        "request_notes": "Milestone 0 normal workflow",
+        "reviewed_by_user_id": 3,
+        "reviewed_at": "2026-09-18T04:26:05",
+        "outcome_notes": "string",
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:52:11",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.019880+00:00",
+      "method": "GET",
+      "path": "/audit-logs?material_id=1&size=100&page=1",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_fulfilled",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #1 fulfilled. Outcome notes: string",
+            "created_at": "2026-09-18T04:26:05"
+          },
+          {
+            "id": 1,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "reason": "Order #1 approved; reservation created. Outcome notes: Approved for Milestone 0",
+            "created_at": "2026-09-18T04:01:52"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.030161+00:00",
+      "method": "POST",
+      "path": "/orders",
+      "role": "viewer",
+      "request": {
+        "material_id": 1,
+        "requested_quantity": 1,
+        "request_notes": "Milestone 0 viewer approval denial"
+      },
+      "status": 201,
+      "response": {
+        "id": 2,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 1,
+        "reserved_quantity": 0,
+        "status": "submitted",
+        "request_notes": "Milestone 0 viewer approval denial",
+        "reviewed_by_user_id": null,
+        "reviewed_at": null,
+        "outcome_notes": null,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.034590+00:00",
+      "method": "GET",
+      "path": "/orders/2",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 2,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 1,
+        "reserved_quantity": 0,
+        "status": "submitted",
+        "request_notes": "Milestone 0 viewer approval denial",
+        "reviewed_by_user_id": null,
+        "reviewed_at": null,
+        "outcome_notes": null,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.038498+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.042329+00:00",
+      "method": "GET",
+      "path": "/audit-logs?material_id=1&size=100&page=1",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_fulfilled",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #1 fulfilled. Outcome notes: string",
+            "created_at": "2026-09-18T04:26:05"
+          },
+          {
+            "id": 1,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "reason": "Order #1 approved; reservation created. Outcome notes: Approved for Milestone 0",
+            "created_at": "2026-09-18T04:01:52"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.046544+00:00",
+      "method": "POST",
+      "path": "/orders/2/approve",
+      "role": "viewer",
+      "request": {},
+      "status": 403,
+      "response": {
+        "error": {
+          "code": "PERMISSION_DENIED",
+          "message": "User does not have sufficient privileges"
+        }
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.050191+00:00",
+      "method": "GET",
+      "path": "/orders/2",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 2,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 1,
+        "reserved_quantity": 0,
+        "status": "submitted",
+        "request_notes": "Milestone 0 viewer approval denial",
+        "reviewed_by_user_id": null,
+        "reviewed_at": null,
+        "outcome_notes": null,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.059172+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.093533+00:00",
+      "method": "GET",
+      "path": "/audit-logs?material_id=1&size=100&page=1",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_fulfilled",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #1 fulfilled. Outcome notes: string",
+            "created_at": "2026-09-18T04:26:05"
+          },
+          {
+            "id": 1,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "reason": "Order #1 approved; reservation created. Outcome notes: Approved for Milestone 0",
+            "created_at": "2026-09-18T04:01:52"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.097607+00:00",
+      "method": "GET",
+      "path": "/orders?material_id=1&size=100&include_archived=true",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "requested_by_user_id": 4,
+            "material_id": 1,
+            "requested_quantity": 1,
+            "reserved_quantity": 0,
+            "status": "submitted",
+            "request_notes": "Milestone 0 viewer approval denial",
+            "reviewed_by_user_id": null,
+            "reviewed_at": null,
+            "outcome_notes": null,
+            "is_archived": false,
+            "archived_at": null,
+            "archived_by_user_id": null,
+            "archive_reason": null,
+            "created_at": "2026-09-18T04:30:09",
+            "updated_at": "2026-09-18T04:30:09"
+          },
+          {
+            "id": 1,
+            "requested_by_user_id": 4,
+            "material_id": 1,
+            "requested_quantity": 20,
+            "reserved_quantity": 0,
+            "status": "fulfilled",
+            "request_notes": "Milestone 0 normal workflow",
+            "reviewed_by_user_id": 3,
+            "reviewed_at": "2026-09-18T04:26:05",
+            "outcome_notes": "string",
+            "is_archived": false,
+            "archived_at": null,
+            "archived_by_user_id": null,
+            "archive_reason": null,
+            "created_at": "2026-09-18T03:52:11",
+            "updated_at": "2026-09-18T04:26:05"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.102384+00:00",
+      "method": "POST",
+      "path": "/orders",
+      "role": "viewer",
+      "request": {
+        "material_id": 1,
+        "requested_quantity": 999999,
+        "request_notes": "Milestone 0 expected stock failure"
+      },
+      "status": 409,
+      "response": {
+        "error": {
+          "code": "ORDER_STOCK_INSUFFICIENT",
+          "message": "Insufficient unreserved stock to submit order"
+        }
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.106999+00:00",
+      "method": "GET",
+      "path": "/orders?material_id=1&size=100&include_archived=true",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "requested_by_user_id": 4,
+            "material_id": 1,
+            "requested_quantity": 1,
+            "reserved_quantity": 0,
+            "status": "submitted",
+            "request_notes": "Milestone 0 viewer approval denial",
+            "reviewed_by_user_id": null,
+            "reviewed_at": null,
+            "outcome_notes": null,
+            "is_archived": false,
+            "archived_at": null,
+            "archived_by_user_id": null,
+            "archive_reason": null,
+            "created_at": "2026-09-18T04:30:09",
+            "updated_at": "2026-09-18T04:30:09"
+          },
+          {
+            "id": 1,
+            "requested_by_user_id": 4,
+            "material_id": 1,
+            "requested_quantity": 20,
+            "reserved_quantity": 0,
+            "status": "fulfilled",
+            "request_notes": "Milestone 0 normal workflow",
+            "reviewed_by_user_id": 3,
+            "reviewed_at": "2026-09-18T04:26:05",
+            "outcome_notes": "string",
+            "is_archived": false,
+            "archived_at": null,
+            "archived_by_user_id": null,
+            "archive_reason": null,
+            "created_at": "2026-09-18T03:52:11",
+            "updated_at": "2026-09-18T04:26:05"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.110735+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.114468+00:00",
+      "method": "GET",
+      "path": "/audit-logs?material_id=1&size=100&page=1",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 2,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_fulfilled",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #1 fulfilled. Outcome notes: string",
+            "created_at": "2026-09-18T04:26:05"
+          },
+          {
+            "id": 1,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "reason": "Order #1 approved; reservation created. Outcome notes: Approved for Milestone 0",
+            "created_at": "2026-09-18T04:01:52"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 2,
+        "pages": 1
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.123435+00:00",
+      "method": "POST",
+      "path": "/orders",
+      "role": "viewer",
+      "request": {
+        "material_id": 1,
+        "requested_quantity": 10,
+        "request_notes": "Milestone 0 approved-order cancellation"
+      },
+      "status": 201,
+      "response": {
+        "id": 3,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 10,
+        "reserved_quantity": 0,
+        "status": "submitted",
+        "request_notes": "Milestone 0 approved-order cancellation",
+        "reviewed_by_user_id": null,
+        "reviewed_at": null,
+        "outcome_notes": null,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.126441+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:26:05"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.134467+00:00",
+      "method": "POST",
+      "path": "/orders/3/approve",
+      "role": "admin",
+      "request": {
+        "outcome_notes": "Milestone 0 reserve 10"
+      },
+      "status": 200,
+      "response": {
+        "id": 3,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 10,
+        "reserved_quantity": 10,
+        "status": "approved",
+        "request_notes": "Milestone 0 approved-order cancellation",
+        "reviewed_by_user_id": 3,
+        "reviewed_at": "2026-09-18T04:30:09",
+        "outcome_notes": "Milestone 0 reserve 10",
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.137801+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 10,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.146249+00:00",
+      "method": "POST",
+      "path": "/orders/3/cancel",
+      "role": "viewer",
+      "request": {
+        "outcome_notes": "Milestone 0 owner cancellation"
+      },
+      "status": 200,
+      "response": {
+        "id": 3,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 10,
+        "reserved_quantity": 0,
+        "status": "canceled",
+        "request_notes": "Milestone 0 approved-order cancellation",
+        "reviewed_by_user_id": 4,
+        "reviewed_at": "2026-09-18T04:30:09",
+        "outcome_notes": "Milestone 0 owner cancellation",
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.149607+00:00",
+      "method": "GET",
+      "path": "/orders/3",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 3,
+        "requested_by_user_id": 4,
+        "material_id": 1,
+        "requested_quantity": 10,
+        "reserved_quantity": 0,
+        "status": "canceled",
+        "request_notes": "Milestone 0 approved-order cancellation",
+        "reviewed_by_user_id": 4,
+        "reviewed_at": "2026-09-18T04:30:09",
+        "outcome_notes": "Milestone 0 owner cancellation",
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T04:30:09",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.153173+00:00",
+      "method": "GET",
+      "path": "/materials/1",
+      "role": "viewer",
+      "request": null,
+      "status": 200,
+      "response": {
+        "id": 1,
+        "material_code": "AGENT-MAT-001",
+        "material_name": "Agent Workflow Control Sample",
+        "material_type": "control sample",
+        "description": "Local fixture for learning the order lifecycle",
+        "source": "Training supplier",
+        "quantity_available": 80,
+        "quantity_reserved": 0,
+        "unit": "units",
+        "minimum_quantity": 20,
+        "availability_status": "available",
+        "qc_status": "passed",
+        "storage_condition": "Store at -20 C",
+        "location_id": 1,
+        "is_archived": false,
+        "archived_at": null,
+        "archived_by_user_id": null,
+        "archive_reason": null,
+        "created_at": "2026-09-18T03:05:50",
+        "updated_at": "2026-09-18T04:30:09"
+      }
+    },
+    {
+      "time": "2026-09-18T04:30:09.156597+00:00",
+      "method": "GET",
+      "path": "/audit-logs?material_id=1&size=100&page=1",
+      "role": "admin",
+      "request": null,
+      "status": 200,
+      "response": {
+        "items": [
+          {
+            "id": 4,
+            "user_id": 4,
+            "material_id": 1,
+            "operation_type": "order_reservation_released",
+            "before_value": "{\"quantity_available\":80,\"quantity_reserved\":10}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #3 canceled; reservation released. Outcome notes: Milestone 0 owner cancellation",
+            "created_at": "2026-09-18T04:30:09"
+          },
+          {
+            "id": 3,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":10}",
+            "reason": "Order #3 approved; reservation created. Outcome notes: Milestone 0 reserve 10",
+            "created_at": "2026-09-18T04:30:09"
+          },
+          {
+            "id": 2,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_fulfilled",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "after_value": "{\"quantity_available\":80,\"quantity_reserved\":0}",
+            "reason": "Order #1 fulfilled. Outcome notes: string",
+            "created_at": "2026-09-18T04:26:05"
+          },
+          {
+            "id": 1,
+            "user_id": 3,
+            "material_id": 1,
+            "operation_type": "order_reservation_created",
+            "before_value": "{\"quantity_available\":100,\"quantity_reserved\":0}",
+            "after_value": "{\"quantity_available\":100,\"quantity_reserved\":20}",
+            "reason": "Order #1 approved; reservation created. Outcome notes: Approved for Milestone 0",
+            "created_at": "2026-09-18T04:01:52"
+          }
+        ],
+        "page": 1,
+        "size": 100,
+        "total": 4,
+        "pages": 1
+      }
+    }
+  ]
+}
