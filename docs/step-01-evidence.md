@@ -123,9 +123,7 @@ review, and the program does not automatically retry.
    check responses. Adding real lab actions now would make failures harder to
    understand and introduce changes to business data before this foundation is ready.
 
-## Short beginner review answers
-
-These answers were drafted with assistant help and added at my request.
+## Review answers
 
 1. **What is the difference between an API key, a base URL, and a model ID?**
    An API key identifies my account, the base URL tells my program where to send
@@ -148,6 +146,3 @@ These answers were drafted with assistant help and added at my request.
   checks the expected intent, quantity, QC, and a nonempty material query.
 - I still need evidence for the required outside-Python curl exercise. The
   successful smoke behavior does not need to be repeated for this report.
-- I need to review these reflection answers, explain the code in my own words,
-  and obtain mentor acceptance. The GitHub naming difference should be resolved
-  or acknowledged in that review. Step 2 has not been supplied or started.

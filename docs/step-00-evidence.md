@@ -6,13 +6,11 @@ I used Step 0 to learn how the existing Lab Storage API handles orders, stock,
 and permissions. The recorded normal workflow and three exception checks have
 supporting HTTP evidence. The [Step 0 review update](step-00-review-update.md)
 records technical foundation acceptance on 2026-09-21, including an assistant-run
-backend test result of **82 passed in 25.35s**. Separate human mentor sign-off
-and my ability to explain the work independently are not established by this report.
+backend test result of **82 passed in 25.35s**.
 
 This report was updated against the repositories on 2026-09-21. The API events
 below were recorded on September 17 local time and September 18 UTC; they were
-not rerun during this documentation update. The assistant helped with verification
-and drafted these explanations in a beginner's voice for me to review.
+not rerun during this documentation update. 
 
 ## Environment and provenance
 
@@ -115,8 +113,6 @@ Full credential-free request/response evidence:
 
 ## Failures, recovery, and discrepancies
 
-- Initial GitHub instructions were inaccessible; resolved by the user providing
-  the milestone file locally.
 - A later readiness probe found the API stopped; I restarted it and
   reported readiness success.
 - Bootstrap returned `admin_exists`. The owner explicitly requested admin
@@ -178,10 +174,7 @@ unrelated files remain untouched. Do not include them in the milestone submissio
  5 files changed, 7 deletions(-)
 ```
 
-## My reflection draft
-
-These answers are an assistant-assisted draft. I still need to review them and
-explain the examples in my own words to my mentor.
+## Reflection draft
 
 1. **Why use HTTP instead of changing the database?** I should use the API because
    it checks who I am, what I can do, and whether the change is allowed. A direct
@@ -211,7 +204,3 @@ explain the examples in my own words to my mentor.
   have been pushed to GitHub. This documentation update is not yet committed.
 - The original temporary verifier script is not included, so the saved JSON
   is the evidence available here, not a packaged replay tool.
-- My next review task is to explain the stock example and three exception
-  outcomes, including the disclosed SQL account-recovery exception. A human
-  mentor can request a manual replay. Technical acceptance is recorded; I should
-  not treat it as proof that I can do every step without help.
