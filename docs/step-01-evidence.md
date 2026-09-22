@@ -123,6 +123,20 @@ review, and the program does not automatically retry.
    check responses. Adding real lab actions now would make failures harder to
    understand and introduce changes to business data before this foundation is ready.
 
+## Short beginner review answers
+
+These answers were drafted with assistant help and added at my request.
+
+1. **What is the difference between an API key, a base URL, and a model ID?**
+   An API key identifies my account, the base URL tells my program where to send
+   requests, and the model ID selects which model to use.
+2. **Does valid JSON requesting 20 samples prove those samples exist?**
+   No. Valid JSON only means the response has a valid format. I still need to
+   check the Lab Storage API to see whether the samples exist.
+3. **Why use fake responses instead of calling Kimi in tests?**
+   Fake responses make tests repeatable, free, and usable without internet or
+   a real API key. They also let me test errors safely.
+
 ## Limitations and next review steps
 
 - My live results are user-supplied terminal evidence, not an independently
