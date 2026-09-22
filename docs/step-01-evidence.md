@@ -1,135 +1,139 @@
-# Step 1 implementation evidence
+# Step 1 evidence — Moonshot API foundations
 
-Status: offline implementation ready; live provider evidence and final acceptance
-pending. Implementation was assistant-authored at the user's explicit request.
-This is not evidence of unaided learner implementation or understanding.
+## Current status
 
-## Scope and provenance
+I now have a small command-line program that can check its configuration, list
+models, ask a text question, and turn a request into a validated JSON object.
+The assistant wrote the implementation at my request. This report and reflection
+answers are assistant-assisted drafts in a beginner's voice for me to review;
+they do not prove that I can build or explain everything independently yet.
 
-Separate project: `/Users/snowflake2.0/Desktop/lab-workflow-agent`.
-Source backend remains at base commit `c96978c7da0a97942d0bb0b452b64f49b411c7a7`
-plus the previously disclosed unrelated changes. Existing Step 0 docs preserved.
-Agent changes are uncommitted; no remote, push, or deployment was created.
+The technical checks pass: **48 offline tests**, plus the successful live results
+I previously pasted from my terminal. Formal Step 1 acceptance is still pending.
+The outside-Python curl exercise is not evidenced here, and human mentor sign-off
+has not been recorded. No Step 2 implementation has been added.
 
-Added packaging, configuration, provider protocol/adapter, CLI, strict intent
-validation, offline tests, lockfile, setup docs, and preserved curriculum files.
-There are no Lab Storage calls, tools, agent loop, frameworks, or business writes.
+## Repository and environment
 
-## Environment and verification
+Reviewed on 2026-09-21 against commit `b8a7ac5` and the working tree.
 
-Python 3.11.15; uv 0.11.26. Resolved SDK openai 2.54.0,
-pydantic 2.13.5, pydantic-settings 2.15.0, httpx 0.28.1, pytest 9.1.1.
-Exact dependency versions are in `uv.lock`.
+- Local project and Python package distribution: `lab-workflow-agent`.
+- Git branch: `main`, tracking `origin/main`; the existing commits have been pushed.
+- Remote: [xfeng167/lab_workflow_agent](https://github.com/xfeng167/lab_workflow_agent).
+  The GitHub name uses underscores, while the assignment asks for
+  `lab-workflow-agent`. This naming difference remains for mentor review.
+- This documentation update is not yet committed or pushed.
+- Python 3.11.15; uv 0.11.26.
+- Locked dependencies: openai 2.54.0, pydantic 2.13.5,
+  pydantic-settings 2.15.0, httpx 0.28.1, pytest 9.1.1. See `uv.lock`.
+- Provider: international Kimi, `https://api.moonshot.ai/v1`.
+- Selected model: `kimi-k2.6`. I kept the assignment default because my recorded
+  models response included it and the live smoke test succeeded with it.
+- Configuration uses a secret environment source or ignored `.env` file.
+  No API key is included in this report.
 
-Offline verification results are appended after final installation below.
-Default tests remove Moonshot variables, change to an empty temporary directory,
-and block socket connections. Mock HTTP tests exercise the actual SDK adapter,
-including bounded request arguments, no automatic retries, and error mapping.
-Fakes cover text/JSON, invalid JSON/fields, strict quantity types, truncation,
-missing credentials, offline doctor, live opt-in, redaction, and smoke stopping.
+## What the code does
 
-Provider: international Kimi, `https://api.moonshot.ai/v1`.
-Model: assignment default `kimi-k2.6`, not yet verified for this account.
-Authenticated models observed: **pending**.
-Live requests performed by this implementation: **0**.
-Project key creation, balance check, curl protocol exercise, live text and JSON
-results: **pending user setup**. No key was read or created.
+| File | How I understand its job |
+| --- | --- |
+| `src/lab_workflow_agent/config.py` | Checks settings, including the key, endpoint, model, and 1–300 completion-token limit. |
+| `src/lab_workflow_agent/provider.py` | Contains the SDK connection and turns provider errors into short application errors. |
+| `src/lab_workflow_agent/service.py` | Rejects incomplete answers and validates the extracted JSON fields. |
+| `src/lab_workflow_agent/cli.py` | Provides `doctor`, `models`, `chat`, `extract-intent`, and `smoke`. Live commands require `--live`. |
+| `tests/test_foundations.py` | Uses fake responses and mocked HTTP to check behavior without spending API credit. |
+| `tests/conftest.py` | Keeps tests away from real credentials and blocks socket connections. |
 
-Official Chat Completions and JSON mode documentation were checked on 2026-09-21.
-K2.6 supports disabling thinking, used for the small token budget. Model availability
-must still be checked with authentication. Documentation examples now also mention
-other models; no silent model upgrade was made.
+The program has no Lab Storage API calls, tools, agent loop, or inventory writes.
+Extracting “find 20 samples” only produces an interpretation of text; it does
+not search real stock or place an order.
 
-## Live evidence to add
+## Offline checks
 
-After key setup and passing offline checks, run `labops-agent models --live`,
-verify the model, then run `labops-agent smoke --live` once. Record model IDs,
-non-secret outputs, usage, finish reasons, successes and attempts. Combined this
-is four requests on success, leaving room for the assignment's two curl checks
-within ten successful requests. Stop and diagnose failures rather than repeatedly
-retrying. Do not paste keys or authorization headers into evidence.
+The assistant reran these checks for this documentation review:
 
-## Learning notes for discussion
+| Command | Result |
+| --- | --- |
+| `UV_CACHE_DIR=/private/tmp/lab-workflow-agent-uv-cache uv run --frozen --offline pytest` | **48 passed in 0.76s**. |
+| `.venv/bin/labops-agent doctor` | Passed: key present, international endpoint, `kimi-k2.6`, limit 300, thinking disabled, network not used. |
+| `uv --version` / `.venv/bin/python --version` | uv 0.11.26 / Python 3.11.15. |
 
-These are assistant-provided explanations, not the learner's reflection answers.
+The first test command could not access the default uv cache because of sandbox
+permissions. Using a writable temporary cache let the offline test run complete.
+This was an environment access problem, not a failing test.
 
-1. Key authenticates the account; base URL locates the service; model ID selects
-   the available model. None is a business rule.
-2. Configurable models allow capability/account changes without rewriting workflow logic.
-3. Finish reason distinguishes a completed answer from truncation or an unexpected
-   tool/refusal outcome; incomplete structured output cannot be accepted.
-4. Valid JSON may have wrong types, unknown fields, or invented facts. Local schema
-   validation checks structure, not truth about inventory.
-5. Fakes make unit tests repeatable, offline, inexpensive, and independent of keys.
-6. No automatic retry occurs here. Authentication, balance, and rate-limit errors
-   require investigation. A later bounded retry policy could handle transient
-   transport/server errors for non-mutating requests.
-7. User errors contain safe categories/actions; development traces may contain
-   sanitized request IDs and timing, never credentials or raw secret-bearing payloads.
-8. Separating provider foundations from tools isolates protocol failures before
-   introducing business state and authorization.
+The original implementation review also recorded `uv sync --frozen --offline`
+passing, 48 tests passing in 1.87s, `.env` and `.env.local` being ignored, a safe
+missing-key error, and rejection of a live command without `--live`.
 
-## Limitations
+Tests cover missing/invalid settings, redaction, live opt-in, text and JSON
+responses, wrong JSON fields/types, invalid quantities and QC values, empty or
+truncated output, malformed provider responses, provider errors, and stopping the
+smoke test after failure. Mocked HTTP checks also verify request settings and that
+no automatic retries occur. These simulated errors are not live provider results.
 
-No live availability or compatibility claim until authenticated smoke evidence is
-provided. Request budget across CLI invocations is tracked manually. Timeouts use
-SDK per-operation limits, not a total process deadline. The international endpoint
-is intentionally allowlisted and HTTP redirects disabled. Strict local validation
-does not establish semantic correctness for arbitrary model extractions. The fixed
-smoke example additionally checks its expected quantity, QC, and intent.
+## Recorded live checks
 
-## Final offline results — 2026-09-21
+These results were supplied by me from my terminal on 2026-09-21 and preserved
+in the earlier evidence report. The assistant did not rerun live requests during
+this update or inspect my API key.
 
-- Initialized this separate repository on `main`; no commit or remote created.
-- `uv sync --frozen --offline`: passed in the destination project.
-- `uv run --frozen --offline pytest`: **48 passed in 1.87s**, exit 0.
-- `.venv/bin/labops-agent doctor` without a key: expected safe `api_key` error.
-- Same doctor command with a temporary fake diagnostic key: configuration printed
-  with `api_key: present`, no key disclosure, and `network: not used`.
-- `labops-agent chat hello` without `--live`: refused before configuration/provider
-  access, as required.
-- `git diff --check`: passed. Since files are untracked in the new repository,
-  additionally checked all 24 non-ignored files for trailing whitespace: none.
-- Checked all non-ignored files for key-shaped strings without printing matches:
-  none found. This is a heuristic, not proof that arbitrary secrets cannot exist.
-- `git check-ignore .env .env.local`: both ignored.
-- Git status: all new project files untracked; `.env` is not created. Existing
-  Step 0 evidence is included, and the backend working-tree status is unchanged.
-- Zero live requests; authenticated `/models`, text and structured smoke results
-  remain pending. Step 1 is not yet accepted.
+1. `uv run labops-agent models --live` initially failed authentication. I was
+   advised to check the international key and any stale exported value. The exact
+   cause and corrective action were not established in the record.
+2. A later `models --live` succeeded and listed `kimi-k2.6`, `kimi-k2.7-code`,
+   `kimi-k2.7-code-highspeed`, and `kimi-k3`. This records what I observed then,
+   not a fresh claim about which models are available today.
+3. `uv run labops-agent smoke --live` completed all three checks:
 
-## User-supplied live verification — 2026-09-21
+| Check | Recorded result |
+| --- | --- |
+| Models | Authenticated listing succeeded. |
+| Text completion | “An API is a set of rules that lets different software applications talk to each other.” Model `kimi-k2.6`; finish reason `stop`; 15 prompt + 20 completion = 35 tokens. |
+| Structured extraction | Intent `find_material`, query `control samples`, quantity 20, QC `passed`. Local validation passed; model `kimi-k2.6`; finish reason `stop`; 109 prompt + 24 completion = 133 tokens. |
 
-This section supersedes the pending live-result entries above. These results were
-pasted by the user from their terminal; the assistant did not make live requests
-or inspect the API key.
+The two completions used **168 reported tokens** in total. Currency cost was not
+reported. The recorded count is **four successful requests and one authentication
+failure: five known attempts**. The repeated models output in the original paste
+was treated as the same result, not another invocation. This is a minimum observed
+count, not an account-wide usage audit. No new live requests were made for this
+review, and the program does not automatically retry.
 
-- Offline doctor independently passed after user key setup: key present,
-  international endpoint, model `kimi-k2.6`, limit 300, thinking disabled.
-- First reported `models --live` attempt failed authentication. The user was
-  advised to verify the international key and clear any stale exported value.
-  The exact cause and corrective action were not established.
-- Subsequent `models --live` succeeded and listed `kimi-k2.6`, `kimi-k2.7-code`,
-  `kimi-k2.7-code-highspeed`, and `kimi-k3`. Retained `kimi-k2.6` because the
-  assignment default is available and supports the configured bounded requests.
-- `uv run labops-agent smoke --live` completed all three checks:
-  1. Authenticated models listing succeeded.
-  2. Text: “An API is a set of rules that lets different software applications
-     talk to each other.” Model `kimi-k2.6`, finish reason `stop`; prompt 15,
-     completion 20, total 35 tokens.
-  3. Locally validated extraction: intent `find_material`, material query
-     `control samples`, quantity 20, QC `passed`. Model `kimi-k2.6`, finish reason
-     `stop`; prompt 109, completion 24, total 133 tokens.
-- Smoke completions used 168 reported tokens total. No currency cost was reported.
-- Visible conversation records show four successful requests (one standalone
-  models call and three smoke calls), plus one authentication failure: five
-  known attempts. The models output repeated in the final paste is treated as
-  the previously supplied result, not evidence of a further invocation. This is
-  a minimum observed count, not a provider-side account usage audit.
-- No automatic retries were used. No further live checks are needed to repeat
-  the already successful smoke behavior.
+## My reflection draft
 
-Technical runtime checks now pass: 48 offline tests and the user-supplied live
-smoke. Formal milestone submission still needs learner reflection/review and any
-required outside-Python curl exercise (not evidenced here). No Step 2 assignment
-or implementation was added. No commit or push has been performed.
+1. **API key, base URL, and model ID:** The key identifies my account, the base URL
+   tells the program where to send the request, and the model ID chooses the model.
+2. **Why keep the model configurable?** I may need a different available model
+   later. Changing a setting is simpler than changing the workflow code.
+3. **What does `finish_reason` mean?** It tells me why generation ended. `stop`
+   means it finished normally; `length` means it ran out of room. This program
+   rejects truncated output instead of treating it as a complete answer.
+4. **Why is valid JSON still untrusted?** JSON can be readable but contain the
+   wrong fields, types, or facts. The schema checks its shape. It cannot prove
+   that the requested samples exist in the lab.
+5. **Why use a fake provider in tests?** Tests can run without a key, network,
+   or API cost. I can also test failures without causing them on a live account.
+6. **Which errors could be retried?** A temporary connection or server problem
+   might allow a limited retry later. A timeout may still have used provider
+   resources. Wrong credentials, balance problems, or rate limits mean I should
+   stop and investigate. This implementation retries nothing automatically.
+7. **What belongs in errors and traces?** A user needs a short explanation and
+   a useful next action. A development trace can include safe timing and request
+   IDs. Neither should contain keys, authorization headers, or secret payloads.
+8. **Why no tools or agent loop yet?** I am first learning to send requests and
+   check responses. Adding real lab actions now would make failures harder to
+   understand and introduce changes to business data before this foundation is ready.
+
+## Limitations and next review steps
+
+- My live results are user-supplied terminal evidence, not an independently
+  captured provider log. They support the recorded smoke behavior only.
+- The request budget across separate commands is tracked manually. I should
+  count any further curl exercise against the assignment's ten-success limit.
+- The SDK uses 30-second operation timeouts; that is not a total process deadline.
+- JSON validation checks structure, not truth. The smoke example additionally
+  checks the expected intent, quantity, QC, and a nonempty material query.
+- I still need evidence for the required outside-Python curl exercise. The
+  successful smoke behavior does not need to be repeated for this report.
+- I need to review these reflection answers, explain the code in my own words,
+  and obtain mentor acceptance. The GitHub naming difference should be resolved
+  or acknowledged in that review. Step 2 has not been supplied or started.

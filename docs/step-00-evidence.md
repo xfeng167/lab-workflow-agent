@@ -1,18 +1,18 @@
 # Milestone 0 evidence
 
-> Updated review: see [Step 0 review update](step-00-review-update.md) for the
-> verified 82-test run, password-change confirmation, search result, and technical acceptance.
-> The dated report below is retained as historical evidence.
-
 ## Current status
 
-The normal order workflow and all three required exception checks have supporting
-HTTP evidence. Backend tests were reported by the learner as **82 passed in
-24.22s**. Document placement and equivalent destination checks are complete. Mentor
-acceptance remains pending. This report does not claim mentor acceptance.
+I used Step 0 to learn how the existing Lab Storage API handles orders, stock,
+and permissions. The recorded normal workflow and three exception checks have
+supporting HTTP evidence. The [Step 0 review update](step-00-review-update.md)
+records technical foundation acceptance on 2026-09-21, including an assistant-run
+backend test result of **82 passed in 25.35s**. Separate human mentor sign-off
+and my ability to explain the work independently are not established by this report.
 
-Reviewed on 2026-09-17 America/Los_Angeles; captured API events extend into
-2026-09-18 UTC. Earlier incomplete draft entries are superseded by this report.
+This report was updated against the repositories on 2026-09-21. The API events
+below were recorded on September 17 local time and September 18 UTC; they were
+not rerun during this documentation update. The assistant helped with verification
+and drafted these explanations in a beginner's voice for me to review.
 
 ## Environment and provenance
 
@@ -23,11 +23,12 @@ Reviewed on 2026-09-17 America/Los_Angeles; captured API events extend into
 - Docker development containers: `lab-storage-mysql-dev` (mysql:8.0) and
   `lab-storage-adminer-dev`; no volumes were deleted.
 - Readiness: `200`, database `ok`, migration `20260812_0004`.
-- The learner was instructed to launch the API from this checkout. Exact process
+- I was instructed to launch the API from this checkout. Exact process
   provenance has not independently been confirmed.
 - Final documents are in
   `/Users/snowflake2.0/Desktop/lab-workflow-agent/docs`, outside the backend.
-  This folder has not been initialized as a Git repository.
+  This is now a separate Git repository on `main`, tracking `origin/main` at
+  `https://github.com/xfeng167/lab_workflow_agent`. The reviewed commit is `b8a7ac5`.
 
 ## Checks and commands
 
@@ -36,12 +37,12 @@ Reviewed on 2026-09-17 America/Los_Angeles; captured API events extend into
 | `uv sync --extra dev --frozen` | Assistant run, exit 0, 33 packages checked |
 | Development Docker Compose status | Assistant observed both containers running |
 | `uv run alembic upgrade head` on documented local development DB | Assistant run, exit 0, already current |
-| `/health`, `/health/ready`, `/docs`, `/openapi.json` | Assistant initially observed 200; learner subsequently confirmed readiness |
-| `uv run pytest` | Learner reported 82 passed in 24.22s; raw test output not independently captured |
+| `/health`, `/health/ready`, `/docs`, `/openapi.json` | Assistant initially observed 200; I subsequently confirmed readiness |
+| Backend tests | I originally reported 82 passed in 24.22s. The later review records an assistant-run dedicated-test-database check: 82 passed in 25.35s. No backend tests rerun for this update. |
 | Unauthenticated `/materials` | Assistant observed 401 `AUTH_HEADER_MISSING` |
-| Verification script | Learner executed; assistant inspected saved HTTP responses and checked audit snapshots |
+| Verification script | I executed; assistant inspected saved HTTP responses and checked audit snapshots |
 | Backend `git diff --check` | Assistant rerun, exit 0 |
-| Destination checks | No Git repository initialized; equivalent whitespace, JSON, and relative-link checks passed |
+| Original destination checks | Whitespace, JSON, and relative-link checks passed before Git initialization; Git is now configured and the existing code has been pushed. |
 
 The local HTTP verifier was invoked with:
 
@@ -59,7 +60,7 @@ verifier. Both verification sessions were logged out by the script.
 | --- | --- | --- |
 | Admin `agent_admin` | 3 | `/users/me` confirmed admin |
 | Viewer `agent_viewer_step00` | 4 | `/users/me` confirmed viewer |
-| Agent Training Freezer | 1 | Learner reported 201; material references location 1 |
+| Agent Training Freezer | 1 | I reported 201; material references location 1 |
 | Material `AGENT-MAT-001` | 1 | Final available 80, reserved 0, QC passed, availability available |
 | Normal request for 20 | 1 | Fulfilled; order reservation 0 |
 | Viewer-denial request for 1 | 2 | Submitted; order reservation 0; intentionally left as evidence |
@@ -67,11 +68,12 @@ verifier. Both verification sessions were logged out by the script.
 
 ### Normal flow
 
-The learner created the fixture, searched/read it, submitted order 1, approved it,
+I created the fixture, searched/read it, submitted order 1, approved it,
 and fulfilled it through Swagger. Screenshots show material 1 at 100/0 before
 approval, 100/20 after approval, and order 1 fulfilled with reservation 0.
-The learner reported submitted status for order 1; search success was reported
-without a captured search response. The saved verifier subsequently read the
+I reported submitted status for order 1; the initial search had no captured response. I later supplied a search result
+for `Agent Workflow`: total 1, material 1, stock 80/0, QC passed, not archived.
+The pasted response did not include an HTTP status. The saved verifier subsequently read the
 fulfilled order, final 80/0 material state, and both original inventory audits.
 
 | Stage | Material available | Material reserved | Order reservation |
@@ -115,20 +117,20 @@ Full credential-free request/response evidence:
 
 - Initial GitHub instructions were inaccessible; resolved by the user providing
   the milestone file locally.
-- A later readiness probe found the API stopped; the learner restarted it and
+- A later readiness probe found the API stopped; I restarted it and
   reported readiness success.
 - Bootstrap returned `admin_exists`. The owner explicitly requested admin
   deletion/recreation. Checks found old local admin `tongtong` (id 1) had no
   order, archive, inventory-audit, or token references. One transaction replaced
   it with admin 3. No other records were deleted. **This direct-database account
-  recovery is an owner-authorized exception to the milestone scope and needs
-  mentor acknowledgment.** It is not API workflow evidence.
+  recovery is an owner-authorized exception to the milestone scope. The later
+  technical review acknowledges it as a setup exception.** It is not API workflow evidence.
 - Initial viewer registration returned `409 USER_IDENTITY_CONFLICT`; a distinct
   username/email produced viewer 4 successfully.
 - Browser automation lost access to the authorized tab. Remaining exception
-  checks were completed using a learner-run HTTP script, not browser automation.
+  checks were completed using an HTTP script I ran, not browser automation.
 - The first verifier run stopped at material 100/20 instead of expected 80/0.
-  It created no orders. The learner then completed fulfillment; the later run
+  It created no orders. I then completed fulfillment; the later run
   passed all checks. The earlier claim that all normal-flow checks were verified
   was premature and has been replaced by actual state/audit evidence.
 - A screenshot showed `409 ORDER_STATUS_CONFLICT`, followed by a fulfilled order
@@ -140,8 +142,9 @@ Full credential-free request/response evidence:
   showing null. Order archive exists but is omitted from README API tables.
 - Staff may set initial stock at material creation and edit location through
   metadata; reports expose broader activity than owner-scoped order reads.
-- Some learner screenshots exposed credentials. They are not included in these
-  deliverables. Password rotation was advised; completion has not been verified.
+- Some of my screenshots exposed credentials. They are not included in these
+  deliverables. I later confirmed changing those passwords. This was my confirmation,
+  not an independent check of the passwords.
 
 ## Source and workspace checks
 
@@ -149,7 +152,7 @@ Required routes, schemas, services, permission constants, migrations, and
 relevant tests were reviewed. Detailed source mapping and invariants are in
 [current system contract](current-system-contract.md).
 
-Final backend status:
+Backend status at the original verification (historical):
 
 ```text
  M src/audit/router.py
@@ -163,7 +166,7 @@ Final backend status:
 
 Tracked changes are seven blank-line deletions across five files. Four files
 were already modified at the initial inspection; `src/main.py` changed during
-the learner session. The assistant introduced no backend source edits. Existing
+my session. The assistant introduced no backend source edits. Existing
 unrelated files remain untouched. Do not include them in the milestone submission.
 
 ```text
@@ -175,42 +178,40 @@ unrelated files remain untouched. Do not include them in the milestone submissio
  5 files changed, 7 deletions(-)
 ```
 
-## Reflection answers
+## My reflection draft
 
+These answers are an assistant-assisted draft. I still need to review them and
+explain the examples in my own words to my mentor.
 
-1. **Why HTTP instead of direct database writes?** The API applies the actual
-   permissions, ownership checks, request validation, transactional transitions,
-   and audit writes. Direct writes bypass that contract and can corrupt related
-   records. Existing migration/test internals are not a license for agent SQL.
-2. **Which transition is authoritative for stock?** Approval rechecks unreserved
-   stock while locking order and material rows, then reserves atomically.
-   Submission only checks current stock; another request can consume it later.
-3. **Available, reserved, unreserved?** Available is total recorded on-hand stock,
-   including allocations. Reserved is the allocated portion. Unreserved is their
-   difference. At A=100/R=20, only 80 is available for new reservations.
-4. **Which rules stay deterministic?** Auth/roles/ownership, allowed states,
-   positive quantities, archive checks, stock constraints, transaction locking,
-   exactly-once transition effects, and audit consistency stay in backend code.
-   An LLM choosing a tool cannot relax these rules.
-5. **Why is HTTP success insufficient?** The wrong target or quantity can still
-   be a successful request; a response alone does not prove the intended
-   inventory delta or audit chain. Re-read state and correlate audit records.
-6. **What can become stale?** Stock/reservations, order status and ownership
-   context, archive flags, material identity/metadata/unit/QC/location, destination
-   location, role permissions, and token validity. Re-read before action and rely
-   on backend checks during execution.
+1. **Why use HTTP instead of changing the database?** I should use the API because
+   it checks who I am, what I can do, and whether the change is allowed. A direct
+   database edit could skip those checks and leave stock or audit records wrong.
+2. **When is stock actually reserved?** Submitting an order checks stock, but
+   approval checks it again and reserves it. Stock can change between those steps.
+3. **What do available and reserved mean here?** In this API, available includes
+   reserved stock. If available is 100 and reserved is 20, only 80 can be reserved
+   for another order. Fulfillment reduces available and removes the reservation.
+4. **Which rules belong in code?** Permissions, order states, quantities, stock
+   checks, and audit records belong in the backend. A model cannot override them.
+5. **Why check more than a successful response?** I could send the wrong quantity
+   and still get success. I need to read the order, stock, and audit records to
+   see whether the intended change happened.
+6. **What can change after I read it?** Stock, order status, material details,
+   and permissions can change. I should read current information and let the
+   backend check the action when it runs.
 
-## Remaining submission and acceptance steps
+## Current repository review and remaining work
 
-1. Have the learner explain the invariants and exception outcomes to the mentor;
-   disclose that exception checks used a script and account recovery used SQL.
-2. Obtain mentor acceptance, including any request for a manual exception replay.
-   Do not mark Milestone 0 accepted or begin Milestone 1 prematurely.
-
-## Final delivery checks
-
-The owner authorized creation of the separate Desktop folder. The three Markdown
-files and supporting JSON evidence were copied there. No backend files changed
-during delivery. No Git repository was initialized, so destination Git diff/status
-results are unavailable; equivalent whitespace, relative-link, and JSON checks
-passed. The temporary verification script was not included in the deliverables.
+- The backend still points to `c96978c7da0a97942d0bb0b452b64f49b411c7a7`.
+  Its current status shows the same five source files modified and the two
+  unrelated resume files added in the index. The historical status above is
+  retained as the original snapshot, not the current staging state.
+- The separate agent repository contains the contract, state-machine notes,
+  this report, the review update, and saved HTTP evidence. Its existing commits
+  have been pushed to GitHub. This documentation update is not yet committed.
+- The original temporary verifier script is not included, so the saved JSON
+  is the evidence available here, not a packaged replay tool.
+- My next review task is to explain the stock example and three exception
+  outcomes, including the disclosed SQL account-recovery exception. A human
+  mentor can request a manual replay. Technical acceptance is recorded; I should
+  not treat it as proof that I can do every step without help.
