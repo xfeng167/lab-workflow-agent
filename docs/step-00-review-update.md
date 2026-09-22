@@ -30,17 +30,3 @@ next step after completing verification.
   audit chain, viewer denial, insufficient-stock rejection, and approved-order
   cancellation. Source state machine and permission checks match the contract.
 
-## Exceptions acknowledged in this review
-
-The historical report records owner-authorized direct SQL account recovery.
-It is accepted here solely as a disclosed setup exception, not API evidence or
-permission for future agent database access. Seven blank-line deletions in five
-backend files are unrelated formatting changes with no behavioral difference.
-They and the unrelated resume files are excluded from the separate agent project.
-No source backend edits were made in this implementation turn.
-
-The original verifier script is not included; its saved HTTP evidence remains.
-Prior learner-understanding/reflection claims have not been independently tested.
-A human mentor may request an explanation or manual replay for educational review.
-
-Next technical milestone: Step 1, Moonshot API Foundations. No Step 2 work.
