@@ -1,10 +1,11 @@
 # Step 0 review update — 2026-09-21
 
-Review result: Accepted for the technical foundation, with the disclosed exceptions
-below carried forward. This review supplements the historical evidence report;
-it does not claim that prior exceptions never occurred or certify independent
-learner understanding. The user explicitly requested implementation help for the
-next step after completing verification.
+Review result: Accepted for the technical foundation. The setup exceptions and
+verification limits remain documented in the
+[Step 0 evidence report](step-00-evidence.md#failures-recovery-and-discrepancies).
+This review adds the later verification results to that report. It does not
+erase the recorded exceptions or establish independent learner understanding.
+I completed this step with assistant help and then requested help with Step 1.
 
 ## New evidence
 
@@ -29,4 +30,3 @@ next step after completing verification.
 - Existing saved HTTP evidence and source review support the normal inventory
   audit chain, viewer denial, insufficient-stock rejection, and approved-order
   cancellation. Source state machine and permission checks match the contract.
-

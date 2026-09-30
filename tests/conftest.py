@@ -8,7 +8,7 @@ def offline(monkeypatch, tmp_path):
     """No real credentials, dotenv, or network in the default suite."""
     import os
     for name in list(os.environ):
-        if name.startswith("MOONSHOT_"):
+        if name.startswith(("MOONSHOT_", "LAB_STORAGE_")):
             monkeypatch.delenv(name)
     monkeypatch.chdir(tmp_path)
     def denied(*args, **kwargs):

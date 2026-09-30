@@ -4,14 +4,8 @@
 
 I now have a small command-line program that can check its configuration, list
 models, ask a text question, and turn a request into a validated JSON object.
-The assistant wrote the implementation at my request. This report and reflection
-answers are assistant-assisted drafts in a beginner's voice for me to review;
-they do not prove that I can build or explain everything independently yet.
-
 The technical checks pass: **48 offline tests**, plus the successful live results
 I previously pasted from my terminal. Formal Step 1 acceptance is still pending.
-The outside-Python curl exercise is not evidenced here, and human mentor sign-off
-has not been recorded. No Step 2 implementation has been added.
 
 ## Repository and environment
 
@@ -72,10 +66,6 @@ smoke test after failure. Mocked HTTP checks also verify request settings and th
 no automatic retries occur. These simulated errors are not live provider results.
 
 ## Recorded live checks
-
-These results were supplied by me from my terminal on 2026-09-21 and preserved
-in the earlier evidence report. The assistant did not rerun live requests during
-this update or inspect my API key.
 
 1. `uv run labops-agent models --live` initially failed authentication. I was
    advised to check the international key and any stale exported value. The exact

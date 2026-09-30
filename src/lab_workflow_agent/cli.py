@@ -4,9 +4,11 @@ import logging
 import sys
 from dataclasses import asdict
 
-from .config import AppError, Settings, load_settings
+from .config import AppError, Settings, load_settings, load_source_settings
 from .provider import MoonshotProvider
 from .service import chat, extract_intent
+from .source_client import LabStorageClient
+from .coordinator import ask
 
 
 def parser() -> argparse.ArgumentParser:
@@ -18,6 +20,10 @@ def parser() -> argparse.ArgumentParser:
         command.add_argument("--live", action="store_true", help="Explicitly authorize live provider requests")
         if name in ("chat", "extract-intent"):
             command.add_argument("prompt")
+    question = commands.add_parser("ask", help="Read-only local material/location question")
+    question.add_argument("prompt")
+    question.add_argument("--live", action="store_true", help="Authorize provider and local source reads")
+    question.add_argument("--include-archived", action="store_true", help="Explicitly authorize archived reads")
     return root
 
 
@@ -36,6 +42,8 @@ def main(argv: list[str] | None = None) -> int:
         logger.propagate = False
         logger.disabled = True
     provider = None
+    source = None
+    source_settings = None
     try:
         if args.command != "doctor" and not args.live:
             raise AppError("Live provider access requires --live. No request was sent.")
@@ -43,12 +51,24 @@ def main(argv: list[str] | None = None) -> int:
             raise AppError("Prompt must contain 1–2000 characters.")
         settings = load_settings()
         if args.command == "doctor":
+            doctor_source = load_source_settings()
             emit({"api_key": "present", "base_url": settings.base_url, "model": settings.model,
                   "max_completion_tokens": settings.max_completion_tokens, "thinking": settings.thinking,
+                  "source": {"api_url": doctor_source.api_url,
+                             "timeout_seconds": doctor_source.timeout_seconds,
+                             "bearer_token": "present" if doctor_source.token_present else "missing"},
                   "network": "not used"}, settings)
             return 0
+        if args.command == "ask":
+            source_settings = load_source_settings(require_token=True)
+            source = LabStorageClient(source_settings)
         provider = MoonshotProvider(settings)
-        if args.command == "models":
+        if args.command == "ask":
+            result = ask(provider, source, args.prompt, allow_archived=args.include_archived)
+            output = json.dumps(asdict(result), indent=2)
+            output = output.replace(source_settings.bearer_token.get_secret_value(), "[REDACTED]")
+            emit(output, settings)
+        elif args.command == "models":
             emit({"models": provider.models()}, settings)
         elif args.command == "chat":
             emit(asdict(chat(provider, args.prompt)), settings)
@@ -72,9 +92,16 @@ def main(argv: list[str] | None = None) -> int:
                   "model": completion.model, "finish_reason": completion.finish_reason,
                   "usage": completion.usage, "requests_completed": 3}, settings)
         return 0
+    except KeyboardInterrupt:
+        print("Interrupted; clients closed.", file=sys.stderr)
+        return 130
     except AppError as exc:
         print(f"Error: {exc}", file=sys.stderr)
         return 1
     finally:
-        if provider is not None:
-            provider.close()
+        try:
+            if provider is not None:
+                provider.close()
+        finally:
+            if source is not None:
+                source.close()
