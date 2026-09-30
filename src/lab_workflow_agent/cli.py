@@ -9,6 +9,7 @@ from .provider import MoonshotProvider
 from .service import chat, extract_intent
 from .source_client import LabStorageClient
 from .coordinator import ask
+from .draft import DraftSession, interact
 
 
 def parser() -> argparse.ArgumentParser:
@@ -24,6 +25,9 @@ def parser() -> argparse.ArgumentParser:
     question.add_argument("prompt")
     question.add_argument("--live", action="store_true", help="Authorize provider and local source reads")
     question.add_argument("--include-archived", action="store_true", help="Explicitly authorize archived reads")
+    draft = commands.add_parser("draft", help="Build one in-memory draft; never create an order")
+    draft.add_argument("prompt")
+    draft.add_argument("--live", action="store_true", help="Authorize provider interpretation and local source reads")
     return root
 
 
@@ -59,11 +63,17 @@ def main(argv: list[str] | None = None) -> int:
                              "bearer_token": "present" if doctor_source.token_present else "missing"},
                   "network": "not used"}, settings)
             return 0
-        if args.command == "ask":
+        if args.command in ("ask", "draft"):
             source_settings = load_source_settings(require_token=True)
             source = LabStorageClient(source_settings)
         provider = MoonshotProvider(settings)
-        if args.command == "ask":
+        if args.command == "draft":
+            secret = source_settings.bearer_token.get_secret_value()
+            def draft_emit(value):
+                emit(str(value).replace(secret, "[REDACTED]"), settings)
+            session = DraftSession(provider, source, args.prompt)
+            interact(session, args.prompt, draft_emit, input)
+        elif args.command == "ask":
             result = ask(provider, source, args.prompt, allow_archived=args.include_archived)
             output = json.dumps(asdict(result), indent=2)
             output = output.replace(source_settings.bearer_token.get_secret_value(), "[REDACTED]")

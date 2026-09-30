@@ -25,6 +25,7 @@ class MaterialRead(BaseModel):
 
     location_id: int | None = Field(default=None, gt=0)
     is_archived: bool
+    updated_at: str | None = None
 
     @property
     def quantity_unreserved(self) -> int:

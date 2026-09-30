@@ -176,3 +176,63 @@ helper is separate from the read-only agent; login is not a model tool. It does
 not register users, change passwords, or create orders. Do not share credentials
 or the `.env` contents. Login can issue a session even if the later file save
 fails; no automatic retries are made.
+
+
+## In-memory order drafts (Step 3)
+
+Step 3 builds an editable draft and **cannot create an order**. Start the local
+API, refresh your private token if necessary, and run:
+
+```bash
+uv run labops-agent draft "I need passed control samples." --live
+```
+
+The model proposes structured searches and edits; local validation and pure state
+transitions decide what is accepted. Source facts come from the local API.
+Select a displayed material ID, then supply a positive integer quantity:
+
+```text
+/select 1
+/quantity 12
+make it 15 instead
+/notes For my experiment
+/show
+/exit
+```
+
+Use an ID actually displayed in your session. A fuzzy single match still needs
+explicit selection. Exact identity lookup uses `/material ID_OR_EXACT_CODE`.
+At most five candidates appear; extra matches require a refined search.
+`/select ID CANDIDATE_REVISION` additionally checks the displayed revision.
+Ordinal answers such as “the second one” are rejected.
+
+Required fields are a selected readable, non-archived material and an integer
+quantity from 1 to 1,000,000 in its source unit. Notes are optional, trimmed, and
+limited to 5,000 characters. Quantities above current unreserved stock remain
+visible but make the draft not ready. There is no rounding or unit conversion;
+use `/quantity INTEGER` when natural wording is ambiguous.
+
+Commands also include `/search DESCRIPTION`, `/refresh`, `/clear-notes`, `/reset`,
+`/abandon`, and `/help`. A new search clears the prior selection and source
+snapshot while retaining quantity and notes. Refresh reads current source facts;
+archive or disappearance invalidates readiness. Reset clears accepted fields,
+candidates, and conversation history. Exit, EOF, and Ctrl-C discard the one
+in-memory draft. Drafts cannot be saved or resumed.
+
+Every preview includes user identity, material facts, revision, read timestamp,
+optional source update timestamp, stock sufficiency, and
+`DRAFT ONLY — NO ORDER CREATED`. Stock is advisory and does not reserve inventory.
+There is no confirmation or submission command.
+
+The session permits six provider attempts, six source reads per turn, sixty
+source reads total, and sixty interactive inputs. Deterministic commands use no
+provider requests. Provider history is bounded to eight messages; source tokens
+and authenticated user details are excluded from model prompts. Natural messages
+are sent to Kimi, so keep them free of secrets. Requests do not automatically retry.
+
+Implementation and offline checks are recorded in
+[Step 3 evidence](docs/step-03-evidence.md). The bounded live scenario passed with two
+provider responses and identical empty viewer-visible order lists before and
+after. Refresh expired tokens privately with
+`uv run python scripts/configure_local_token.py`. Mentor acceptance remains a
+separate review gate before Step 4.
