@@ -3,8 +3,9 @@
 ## Status and implementation reference
 
 I implemented against Step 3 commit `abbb374`. The Step 4 implementation is in the commit containing this report.
-I completed the offline implementation and tests. I have not performed the real
-acceptance write or recorded mentor acceptance. I did not begin Step 5.
+I completed the offline implementation and tests. The supplied live receipt
+verifies order 4 was submitted successfully. Live confirmation-reuse evidence
+and mentor acceptance remain outstanding. I did not begin Step 5.
 
 I rechecked the local source `src/order/schemas.py`, `router.py`, and `service.py`.
 Creation accepts material ID, integer quantity, and optional trimmed notes. It
@@ -99,7 +100,7 @@ I cover:
 Write-path tests assert the exact fake POST count: zero before authorization or
 after invalidation, and at most one after confirmed execution.
 
-## Live preflight and pending acceptance
+## Live preflight and submission evidence
 
 I attempted a read-only local preflight on 2026-09-30. The saved token was rejected
 at `GET /users/me`, before material or order-list reads. I stopped immediately.
@@ -111,45 +112,43 @@ order list. The material was active, QC passed, location 1, unit `units`, with
 `2026-09-18T04:30:09`. The matching order list was empty (`total=0`, IDs `[]`).
 This successful preflight used three source reads, zero provider requests, and
 zero POSTs. Including the rejected-token preflight, four reads were attempted.
-The proposed action remains quantity 1 with notes none; live submission awaits
-the exact manual confirmation in the private terminal.
+### Live submission receipt supplied on 2026-10-01
 
-I have no Step 4 live order ID, receipt, or live confirmation-reuse proof yet.
-The Step 3 fixture was material 1 (`AGENT-MAT-001`), but I must revalidate its
-current facts before a write.
+My terminal receipt reports verified success from the original response:
 
-The concrete proposed acceptance action is one local order for material 1,
-quantity 1, notes none, under the authenticated local user. I will not create it
-until the owner reviews the current canonical preview and enters its exact
-confirmation command manually. If the source fixture or identity differs from
-what the owner approves, I will stop.
+| Field | Recorded value |
+| --- | --- |
+| Order ID | 4 |
+| Requester ID | 6 |
+| Material | 1 / AGENT-MAT-001 |
+| Quantity / notes | 1 / none |
+| Status / reservation | submitted / 0 |
+| Baseline order IDs | [] |
+| Known order IDs | [4] |
+| Available before / after | 80 / 80 |
+| Reserved before / after | 0 / 0 |
+| POST attempts | 1 |
+| Action source reads | 7 |
+| Receipt origin | response |
+| Preview reference (not capability) | 2de44c9e0d49e237 |
+| Request ID | 3c71fc0f1a9d43fca19f0751191fbf4a |
+| Verified at | 2026-10-01T23:22:17.841536+00:00 |
 
-Pending manual sequence:
+This is the supplied application receipt, not a separate later source inspection.
+The application verified the order and observed unchanged stock. The receipt does
+not include draft-read or provider-response totals, so I have not inferred them.
+I did not retain the private confirmation capability. A redacted preview/manual
+confirmation transcript and live reuse-rejection output were not supplied.
+The session was exited; I cannot reproduce its in-memory confirmation now.
+Offline tests cover confirmation reuse, but I do not claim a live reuse check.
+I will not create another order to repeat this acceptance scenario.
 
-```bash
-uv run python scripts/configure_local_token.py
-uv run labops-agent order "/material 1" --live
-```
-
-```text
-/quantity 1
-/preview
-confirm <PRIVATE_CURRENT_PREVIEW_ID>
-confirm <SAME_PRIVATE_PREVIEW_ID>
-/show
-/exit
-```
-
-I must replace the placeholders only in the private terminal. I will retain a
-redacted preview and confirmation, baseline order IDs, source request ID, returned
-and re-read order ID/status, before/after material quantities, zero reservation,
-verification time, call counts, and the rejected reuse result. I will not repeat
-the acceptance write for presentation quality. If the outcome is ambiguous, I
-will review the source instead of starting another write.
-
-I will rerun offline tests after the one real acceptance scenario. No cleanup is
-needed yet because no real order has been created. Any eventual cleanup belongs
-to the trusted source UI/API; I did not add cancellation here.
+The supplied offline result was **357 passed in 1.24s**. Its timing relative to
+the live write is not established. After receiving the successful live receipt,
+I reran the offline suite: **357 passed in 1.27s**. Whitespace validation passed.
+No cleanup was reported; the last verified
+state of order 4 is submitted. Cleanup, if requested, belongs to the trusted
+source UI/API and is not part of this implementation.
 
 ## Limitations
 
@@ -158,7 +157,7 @@ termination. The one-attempt guard is per session/process, not a durable
 idempotency guarantee. A concurrent matching order can make reconciliation
 uncertain. My read bounds stop large or incomplete baselines. I keep all new
 workflow state in memory, and the backend remains authoritative for permission
-and locked stock checks. The live acceptance and mentor review remain pending.
+and locked stock checks. The missing live evidence and mentor review remain pending.
 
 ## Reflection
 
@@ -183,6 +182,8 @@ and locked stock checks. The live acceptance and mentor review remain pending.
 
 ## Push verification
 
-On 2026-10-01, I reran the offline suite before committing: **357 passed in 1.32s**.
-Whitespace validation passed, and the eight files contained no configured API key
-or source token. Manual live acceptance remains unverified.
+On 2026-10-01, I reran the offline suite before committing. All **357 tests passed in 1.32 seconds**.
+
+I verified that whitespace checks passed and that none of the eight files contained the configured API key or source token.
+
+Live submission is verified by the supplied receipt; live confirmation reuse remains unverified.
