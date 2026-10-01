@@ -110,7 +110,7 @@ class LabStorageClient:
 
     def _get(self, path: str, model: type[ResponseT], label: str,
              *, params: dict | None = None) -> ResponseT:
-        # Only the five application-owned read methods supply paths to this helper.
+        # Only application-owned read methods supply paths to this helper.
         self.last_request_id = None
         try:
             response = self._client.get(path, params=params)
@@ -143,3 +143,65 @@ class LabStorageClient:
         except (ValueError, UnicodeError, ValidationError):
             raise SourceError(f"Lab Storage returned invalid {label} data.", status=200,
                               request_id=self.last_request_id) from None
+
+    def get_order(self, order_id: int):
+        from .order_models import OrderRead
+        if type(order_id) is not int or order_id <= 0:
+            raise AppError('Order ID must be a positive integer.')
+        result = self._get(f'/orders/{order_id}', OrderRead, 'order')
+        if result.id != order_id:
+            raise SourceError('Lab Storage returned a different order ID.')
+        return result
+
+    def list_orders(self, *, material_id: int, page: int = 1, size: int = 10):
+        from .order_models import OrderRead
+        if type(material_id) is not int or material_id <= 0:
+            raise AppError('Material ID must be a positive integer.')
+        try:
+            args = PageArgs(page=page, size=size)
+        except ValidationError:
+            raise AppError('Invalid order pagination arguments.') from None
+        result = self._get('/orders', Page[OrderRead], 'order page', params={
+            **args.model_dump(), 'material_id': material_id, 'include_archived': True})
+        self._check_page(result, args)
+        if any(order.material_id != material_id for order in result.items):
+            raise SourceError('Lab Storage returned an unexpected order material.')
+        return result
+
+    def create_order(self, payload, *, request_id: str):
+        """Single HTTP attempt. Only the confirmed executor calls this method."""
+        from .order_models import OrderCreate, OrderRead
+        if not isinstance(payload, OrderCreate):
+            raise AppError('Order creation requires a validated application payload.')
+        payload = OrderCreate.model_validate(payload.model_dump())
+        if not isinstance(request_id, str) or not re.fullmatch(r'[a-f0-9]{32}', request_id):
+            raise AppError('Invalid application request ID.')
+        self.last_request_id = request_id
+        try:
+            response = self._client.post('/orders', content=payload.canonical(), headers={
+                'Content-Type': 'application/json', 'X-Request-ID': request_id})
+        except httpx.HTTPError:
+            raise AmbiguousWrite('Order outcome is unknown; no POST retry was attempted.', request_id=request_id) from None
+        if response.status_code == 201:
+            try:
+                return OrderRead.model_validate(response.json())
+            except (ValueError, UnicodeError):
+                raise AmbiguousWrite('Order response was invalid; reconciliation is required.', request_id=request_id) from None
+        code = None
+        try:
+            code = self._safe_metadata(ErrorResponse.model_validate(response.json()).error.code)
+        except (ValueError, UnicodeError):
+            pass
+        known = (response.status_code in (401, 403)
+                 or (response.status_code, code) in {
+                     (404, 'MATERIAL_NOT_FOUND'), (409, 'MATERIAL_ARCHIVED'),
+                     (409, 'ORDER_STOCK_INSUFFICIENT'), (422, 'VALIDATION_ERROR')})
+        if known:
+            raise SourceError('Order submission was rejected by Lab Storage.',
+                              status=response.status_code, code=code, request_id=request_id)
+        raise AmbiguousWrite('Order outcome is unknown; reconciliation is required.',
+                             status=response.status_code, code=code, request_id=request_id)
+
+
+class AmbiguousWrite(SourceError):
+    """The request may have committed. Never automatically resend it."""

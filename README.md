@@ -236,3 +236,64 @@ provider responses and identical empty viewer-visible order lists before and
 after. Refresh expired tokens privately with
 `uv run python scripts/configure_local_token.py`. Mentor acceptance remains a
 separate review gate before Step 4.
+
+## Confirmed order submission (Step 4)
+
+`draft` remains read-only. The separate `order` command can submit one order after
+an exact user confirmation. Use only the local development API and an approved
+fixture. Deterministic commands require no model requests:
+
+```bash
+uv run labops-agent order "/material <LOCAL_MATERIAL_ID>" --live
+```
+
+```text
+/quantity 1
+/notes Optional local test note
+/preview
+confirm <PREVIEW_ID_SHOWN_IN_YOUR_TERMINAL>
+/show
+/exit
+```
+
+Do not copy the angle-bracket placeholders literally. Review the material,
+identity, quantity, notes, and stock facts in the displayed preview before typing
+its exact command. `yes`, model output, and missing/old preview IDs cannot submit.
+Keep the confirmation capability private: do not copy it into notes, prompts,
+screenshots, logs, or evidence. Redact it when recording the acceptance transcript.
+A non-secret preview reference appears in receipts for correlation.
+
+`/preview` refreshes user and material facts and displays the exact canonical
+`POST /orders` payload. `/cancel` cancels the preview. Draft edits invalidate it;
+a new preview has a new random capability. Re-displaying does not submit.
+Immediately before execution, the application obtains a complete matching-order
+baseline (up to ten pages of ten records), then refreshes identity and material
+again. Relevant changes invalidate confirmation and identify changed fields.
+Choose `/preview` again only after reviewing the changes. Incomplete baseline or
+failed reads cause no POST.
+
+The confirmation attempt is consumed under a process lock before the single POST.
+After any POST attempt, the session cannot submit again, even with another
+preview. Redirects and automatic retries are disabled. `X-Request-ID` is only a
+correlation ID: the backend has **no creation idempotency key**.
+
+A `201` is verified by reading the order and material. A receipt reports exact
+order fields, reservation, and observed stock. If stock changed, the receipt
+reports the difference without attributing it to submission. Submission creates
+`submitted` status with zero reservation; approval checks stock and reserves later.
+
+Timeouts, connection loss, malformed success, and verification failure enter
+reconciliation. Bounded reads compare new order IDs against the complete baseline
+and inspect each new candidate. One fully matching candidate, including a plausible
+creation timestamp, can yield reconciled success; missing timestamps, multiple
+matches, no match, or incomplete reads require owner review. No POST is retried.
+The local source's timezone-free creation timestamps are interpreted as UTC, with
+a two-second tolerance for database timestamp precision. This is not exactly-once
+execution; another client can concurrently create an indistinguishable order.
+
+Confirmation, baselines, and receipts remain in memory. Exiting loses this state
+and cannot undo an order. After interruption, inspect the source with the owner
+before starting a new submission. This milestone adds submission only: no approval,
+rejection, fulfillment, cancellation, archival, or durable resume support.
+See [Step 4 evidence](docs/step-04-evidence.md) for tested behavior and the pending
+single manual acceptance write.

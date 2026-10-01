@@ -10,6 +10,7 @@ from .service import chat, extract_intent
 from .source_client import LabStorageClient
 from .coordinator import ask
 from .draft import DraftSession, interact
+from .submission import interact_order
 
 
 def parser() -> argparse.ArgumentParser:
@@ -28,6 +29,9 @@ def parser() -> argparse.ArgumentParser:
     draft = commands.add_parser("draft", help="Build one in-memory draft; never create an order")
     draft.add_argument("prompt")
     draft.add_argument("--live", action="store_true", help="Authorize provider interpretation and local source reads")
+    order = commands.add_parser("order", help="Preview and explicitly confirm one local order submission")
+    order.add_argument("prompt")
+    order.add_argument("--live", action="store_true", help="Authorize live draft reads; submission requires exact confirmation")
     return root
 
 
@@ -63,16 +67,17 @@ def main(argv: list[str] | None = None) -> int:
                              "bearer_token": "present" if doctor_source.token_present else "missing"},
                   "network": "not used"}, settings)
             return 0
-        if args.command in ("ask", "draft"):
+        if args.command in ("ask", "draft", "order"):
             source_settings = load_source_settings(require_token=True)
             source = LabStorageClient(source_settings)
         provider = MoonshotProvider(settings)
-        if args.command == "draft":
+        if args.command in ("draft", "order"):
             secret = source_settings.bearer_token.get_secret_value()
             def draft_emit(value):
                 emit(str(value).replace(secret, "[REDACTED]"), settings)
             session = DraftSession(provider, source, args.prompt)
-            interact(session, args.prompt, draft_emit, input)
+            flow = interact_order if args.command == "order" else interact
+            flow(session, args.prompt, draft_emit, input)
         elif args.command == "ask":
             result = ask(provider, source, args.prompt, allow_archived=args.include_archived)
             output = json.dumps(asdict(result), indent=2)
